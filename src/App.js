@@ -1,40 +1,36 @@
 import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { ThemeProvider } from 'styled-components';
 import {NewFormControl,ColorCard} from './styles'
 import {Container,ButtonGroup,ToggleButton} from 'react-bootstrap';
-
+let colors= ["black","blue","red","green","yellow"];
 
 function App() {
-  const [checked1  ,setChecked1  ]= useState(false);
-  const [checked2  ,setChecked2  ]= useState(false);
-  const [checked3  ,setChecked3  ]= useState(false);
-  const [color  ,setColor  ]= useState("black");
-  const theme = {
-    "textDecoration" : checked3?"underline":"",
-    "fontWeight" : checked1?"bold":"",
-    "fontStyle" : checked2?"italic":"",
-    "color" : color
+  const [theme  ,setTheme]=useState([{bold:false,underline:false,italic:false,color:"black"}])
+
+  const changeTheme = (key) => e => {
+    const temp = theme[0];
+    temp[key]=e.currentTarget.checked
+    setTheme([temp])
+  }
+  const theme2 = {
+    "textDecoration" : theme[0].underline?"underline":"",
+    "fontWeight" : theme[0].bold?"bold":"",
+    "fontStyle" : theme[0].italic?"italic":"",
+    "color" : theme[0].color
   };
-  let array= ["black","blue","red","green","yellow"];
-  array=array.map(a=><ColorCard key={a} onClick={()=>setColor(a)} background={a}></ColorCard>
+  let buttons = [];
+  for(const key in theme[0]){
+    if(key!=="color")
+    buttons.push(<ToggleButton key={key} type="checkbox" variant="primary" checked={theme[0][key]} onChange={changeTheme(key)}>{key}</ToggleButton>)
+  }
+  let colorBox=colors.map(a=><ColorCard checked={a} key={a} onClick={changeTheme("color")} background={a}/>
   );
-  return (<ThemeProvider theme={theme}><Container>
-      <ButtonGroup toggle className="mb-2">
-        <ToggleButton type="checkbox" variant="primary" checked={checked1} value="1" onChange={(e) => setChecked1(e.currentTarget.checked)}>
-        Bold
-        </ToggleButton>
-        <ToggleButton type="checkbox" variant="primary" checked={checked2} value="1" onChange={(e) => setChecked2(e.currentTarget.checked)}>
-        Italic
-        </ToggleButton>
-        <ToggleButton type="checkbox" variant="primary" checked={checked3} value="1" onChange={(e) => setChecked3(e.currentTarget.checked)}>
-        underline
-        </ToggleButton>        </ButtonGroup>
-    <NewFormControl />
-      {array}
+  return (
+  <Container>
+    <ButtonGroup toggle className="mb-2">{buttons}</ButtonGroup>
+    <NewFormControl theme={theme2} />
+    {colorBox}
   </Container>
-  </ThemeProvider>
   );
 }
-
 export default App;
